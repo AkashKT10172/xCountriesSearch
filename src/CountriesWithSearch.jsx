@@ -3,26 +3,29 @@ import React, { useEffect, useState } from "react";
 function App() {
   const [countries, setCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch data from the REST Countries API
     fetch("https://restcountries.com/v3.1/all")
       .then((response) => {
+        // Log the status so Cypress (or your tests) can confirm it is 200
+        console.log("API call success with status:", response.status);
         if (!response.ok) {
+          // Log the error status as well
+          console.error("API call failed with status:", response.status);
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
       })
       .then((data) => {
         setCountries(data);
-        setIsLoading(false); // Data fetched successfully
+        setIsLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setIsLoading(false); // Stop loading even if there's an error
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setError(err);
+        setIsLoading(false);
       });
   }, []);
 
@@ -31,8 +34,38 @@ function App() {
     country.name.common.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Inline styles for various components
+  // Inline styles
   const styles = {
+    header: {
+      position: "fixed",
+      top: "0",
+      left: "0",
+      width: "100%",
+      backgroundColor: "#f8f8f8",
+      padding: "10px",
+      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+      zIndex: 1000,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    searchInput: {
+      width: "50%",
+      padding: "10px",
+      fontSize: "16px",
+      border: "1px solid #ccc",
+      borderRadius: "5px",
+      maxWidth: "400px",
+    },
+    container: {
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "100px 20px 20px 20px", // account for fixed header
+      minHeight: "100vh",
+      backgroundColor: "#f0f0f0",
+    },
     card: {
       width: "200px",
       border: "1px solid #ccc",
@@ -45,36 +78,6 @@ function App() {
       justifyContent: "center",
       boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
       backgroundColor: "#fff",
-    },
-    container: {
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "100px 20px 20px 20px", // Adjusted padding to account for fixed header
-      minHeight: "100vh",
-      backgroundColor: "#f0f0f0",
-    },
-    header: {
-      position: "fixed",
-      top: "0",
-      left: "0",
-      width: "100%",
-      backgroundColor: "#f8f8f8",
-      padding: "10px",
-      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-      zIndex: "1000",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    searchInput: {
-      width: "50%",
-      padding: "10px",
-      fontSize: "16px",
-      border: "1px solid #ccc",
-      borderRadius: "5px",
-      maxWidth: "400px", // Ensures the search bar doesn't get too wide on large screens
     },
     flagImage: {
       width: "100px",
@@ -122,7 +125,7 @@ function App() {
           </p>
         ) : filteredCountries.length > 0 ? (
           filteredCountries.map((country) => (
-            <div key={country.cca3} style={styles.card} className="countryCard">
+            <div key={country.cca3} className="countryCard" style={styles.card}>
               <img
                 src={country.flags.png}
                 alt={`Flag of ${country.name.common}`}
