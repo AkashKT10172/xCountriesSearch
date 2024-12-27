@@ -6,7 +6,12 @@ function App() {
 
   useEffect(() => {
     fetch("https://restcountries.com/v3.1/all")
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => setCountries(data))
       .catch((error) => console.error("Error fetching data: ", error));
   }, []);
@@ -58,6 +63,7 @@ function App() {
   const imageStyle = {
     width: "100px",
     height: "100px",
+    objectFit: "cover",
   };
 
   return (
@@ -73,7 +79,7 @@ function App() {
       </div>
       <div style={containerStyle}>
         {filteredCountries.map((country) => (
-          <div key={country.cca3} style={cardStyle} class="countryCard">
+          <div key={country.cca3} style={cardStyle} className="countryCard">
             <img
               src={country.flags.png}
               alt={`Flag of ${country.name.common}`}
