@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios"; // <-- Import Axios
 
 function App() {
   const [countries, setCountries] = useState([]);
@@ -7,19 +8,19 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all")
+    // Use Axios instead of fetch so Cypress .intercept is more reliable
+    axios
+      .get("https://restcountries.com/v3.1/all")
       .then((response) => {
-        // Log the status so Cypress (or your tests) can confirm it is 200
+        // Log status code for Cypress test
         console.log("API call success with status:", response.status);
-        if (!response.ok) {
-          // Log the error status as well
+
+        if (response.status !== 200) {
           console.error("API call failed with status:", response.status);
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        return response.json();
-      })
-      .then((data) => {
-        setCountries(data);
+
+        setCountries(response.data);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -31,7 +32,7 @@ function App() {
 
   // Filter countries based on the search term
   const filteredCountries = countries.filter((country) =>
-    country.name.common.toLowerCase().includes(searchTerm.toLowerCase())
+    country.name?.common?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Inline styles
@@ -125,13 +126,17 @@ function App() {
           </p>
         ) : filteredCountries.length > 0 ? (
           filteredCountries.map((country) => (
-            <div key={country.cca3} className="countryCard" style={styles.card}>
+            <div
+              key={country.cca3}
+              className="countryCard" // Important className for test
+              style={styles.card}
+            >
               <img
-                src={country.flags.png}
-                alt={`Flag of ${country.name.common}`}
+                src={country.flags?.png}
+                alt={`Flag of ${country.name?.common}`}
                 style={styles.flagImage}
               />
-              <h2 style={styles.countryName}>{country.name.common}</h2>
+              <h2 style={styles.countryName}>{country.name?.common}</h2>
             </div>
           ))
         ) : (
