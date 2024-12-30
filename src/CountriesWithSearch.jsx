@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     // Use Axios instead of fetch so Cypress .intercept is more reliable
     axios
-      .get("https://restcountries.com/v3.1/all")
+      .get("https://0b9f457a-c7f4-4a28-9f68-2fe10314cedd.mock.pstmn.io/crio ")
       .then((response) => {
         // Log status code for Cypress test
         console.log("API call success with status:", response.status);
@@ -30,11 +30,12 @@ function App() {
       });
   }, []);
 
+
   // Filter countries based on the search term
   const filteredCountries = countries.filter((country) =>
-    country.name?.common?.toLowerCase().includes(searchTerm.toLowerCase())
+    country.common?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  console.log(filteredCountries);
   // Inline styles
   const styles = {
     header: {
@@ -132,11 +133,11 @@ function App() {
               style={styles.card}
             >
               <img
-                src={country.flags?.png}
-                alt={`Flag of ${country.name?.common}`}
+                src={country.png}
+                alt={`Flag of ${country.common}`}
                 style={styles.flagImage}
               />
-              <h2 style={styles.countryName}>{country.name?.common}</h2>
+              <h2 style={styles.countryName}>{country.common}</h2>
             </div>
           ))
         ) : (
